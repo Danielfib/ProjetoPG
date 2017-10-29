@@ -19,23 +19,41 @@ function resizeCanvas() {
 }
 
 function drawPoints(){
-    //desenha todos os pontos
-    contadorPontos = contadorPontos + 1;
-    for (var i in points){
-        ctx.beginPath();
-        ctx.arc(points[i].x, points[i].y, 5, 0, 2 * Math.PI);
-        ctx.fillStyle = 'red';
-        ctx.fill();
+  //desenha todos os pontos
+  for (var i in points){
+    ctx.beginPath();
+    ctx.arc(points[i].x, points[i].y, 5, 0, 2 * Math.PI);
+    ctx.fillStyle = 'red';
+    ctx.fill();
+
+    //ligando os pontos
+    if(i > 0){
+      var xAtual = points[i-1].x;
+      var yAtual = points[i-1].y;
+      ctx.moveTo(xAtual, yAtual);
+      ctx.lineTo(points[i].x, points[i].y);
+      ctx.stroke();
+    }
     
-        //ligando os pontos
-        if(i > 0){
-            var xAtual = points[i-1].x;
-            var yAtual = points[i-1].y;
-            ctx.moveTo(xAtual, yAtual);
-            ctx.lineTo(points[i].x, points[i].y);
-            ctx.stroke();
+      
+    var t = 0.5;
+    for(c = 0; c < contadorPontos; c++){
+        if(c < points.length-1){
+            //console.log("i:" + i.toString());
+            //console.log("tamanho de points:" + points.length.toString());
+            var pontoNovo = {x:points[c].x + (points[c+1].x - points[c].x)*t,
+                             y:points[c].y + (points[c+1].y - points[c].y)*t}
+            pointsC1.push(pontoNovo);            
         }
-    }    
+    }
+      
+    for (var c in pointsC1){
+      ctx.beginPath();
+      ctx.arc(pointsC1[c].x, pointsC1[c].y, 5, 0, 2 * Math.PI);
+      ctx.fillStyle = '#000000';
+      ctx.fill();
+    }
+  }    
 }
 
 function dist(p1, p2) {
@@ -55,6 +73,7 @@ function getIndex(click) {
 
 var contadorPontos = 0;
 var points = [];
+var pointsC1 = [];
 var move = false;
 var index = -1; //o getIndex itera essa variavel
 
@@ -64,6 +83,7 @@ canvas.addEventListener('mousedown', e => {
   var click = {x: e.offsetX, y: e.offsetY, v:{x: 0, y:0}};
   index = getIndex(click);
   if (index === -1) {
+    contadorPontos = contadorPontos + 1;
     points.push(click);
     drawPoints();
   } else {
@@ -78,21 +98,22 @@ canvas.addEventListener('mouseup', e => {
 canvas.addEventListener('dblclick', e => {
   if (index !== -1) {
     points.splice(index, 1);
-    drawCircles();
+    //falta remover o ponto C1
+    drawPoints();
   }
 });
 
 //mover
 canvas.addEventListener('mousemove', e => {
-    if(move){
-       var antigo = points[index];
-       points[index] = {x: e.offsetX, y: e.offsetY, v:{x:0 , y:0}};
-       points[index].v = {x: e.offsetX - old.x, y: e.offsetY - old.y}
-       drawPoints();
-    }     
+  if(move){
+    var antigo = points[index];
+    points[index] = {x: e.offsetX, y: e.offsetY, v:{x:0 , y:0}};
+    points[index].v = {x: e.offsetX - antigo.x, y: e.offsetY - antigo.y}
+    drawPoints();
+  }     
 });
 
 setInterval(() => {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);//redesenha o canvas
-    drawPoints();
-}, 1000 / 30);
+  ctx.clearRect(0, 0, canvas.width, canvas.height);//redesenha o canvas
+  drawPoints();
+}, 100);
