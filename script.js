@@ -13,6 +13,14 @@ var output = document.getElementById("demo");
 //}
 //-----------------------------------------------------------------
 
+var av = 10;//numero de avaliacao(vai ser escolhido pelo usuario)
+var contadorPontos = 0;
+var points = [];//array dos pontos colocados pelo usuario
+var move = false; //usado no mover ponto
+var index = -1; //o getIndex itera ela, e ela serve pro clique do mouse
+
+resizeCanvas();
+
 function resizeCanvas() {
   canvas.width = parseFloat(window.getComputedStyle(canvas).width);
   canvas.height = parseFloat(window.getComputedStyle(canvas).height);
@@ -34,28 +42,23 @@ function drawPoints(){
       ctx.lineTo(points[i].x, points[i].y);
       ctx.stroke();
     }
-    
-      
-    var t = 0.5;
-    for(c = 0; c < contadorPontos; c++){
-        if(c < points.length-1){
-            //console.log("i:" + i.toString());
-            //console.log("tamanho de points:" + points.length.toString());
-            var pontoNovo = {x:points[c].x + (points[c+1].x - points[c].x)*t,
-                             y:points[c].y + (points[c+1].y - points[c].y)*t}
-            pointsC1.push(pontoNovo);            
-        }
-    }
-      
-    for (var c in pointsC1){
-      ctx.beginPath();
-      ctx.arc(pointsC1[c].x, pointsC1[c].y, 5, 0, 2 * Math.PI);
-      ctx.fillStyle = '#000000';
-      ctx.fill();
-    }
   }    
 }
 
+function drawCurve(){    
+    var pointsCurve = [];
+    for(t = 0; t < 1; t = t + t/av){
+        //para cada avaliacao:
+        for(n = 1; n < contadorPontos; n++){
+            //para cada nivel:             
+            for(p = 0; p < contadorPontos - n; p++){
+                //para cada ponto:    
+            }
+        }
+    }
+}
+
+//pega dist entre dois pontos
 function dist(p1, p2) {
   var v = {x: p1.x - p2.x, y: p1.y - p2.y};
   return Math.sqrt(v.x * v.x + v.y * v.y);
@@ -70,14 +73,6 @@ function getIndex(click) {
   }
   return -1;
 }
-
-var contadorPontos = 0;
-var points = [];
-var pointsC1 = [];
-var move = false;
-var index = -1; //o getIndex itera essa variavel
-
-resizeCanvas();
 
 canvas.addEventListener('mousedown', e => {
   var click = {x: e.offsetX, y: e.offsetY, v:{x: 0, y:0}};
@@ -113,6 +108,8 @@ canvas.addEventListener('mousemove', e => {
   }     
 });
 
+//intervalo de redesenho do canvas
+//a ultima linha contem a quant de milissegundos entre cada acao
 setInterval(() => {
   ctx.clearRect(0, 0, canvas.width, canvas.height);//redesenha o canvas
   drawPoints();
