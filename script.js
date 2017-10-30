@@ -13,7 +13,7 @@ var output = document.getElementById("demo");
 //}
 //-----------------------------------------------------------------
 
-var av = 10;//numero de avaliacao(vai ser escolhido pelo usuario)
+var av = 1000;//numero de avaliacao(vai ser escolhido pelo usuario)
 var contadorPontos = 0;
 var points = [];//array dos pontos colocados pelo usuario
 var move = false; //usado no mover ponto
@@ -26,9 +26,9 @@ function resizeCanvas() {
   canvas.height = parseFloat(window.getComputedStyle(canvas).height);
 }
 
-function drawPoints(){
+function drawPoints() {
   //desenha todos os pontos
-  for (var i in points){
+  for (var i in points) {
     ctx.beginPath();
     ctx.arc(points[i].x, points[i].y, 5, 0, 2 * Math.PI);
     ctx.fillStyle = 'red';
@@ -42,20 +42,46 @@ function drawPoints(){
       ctx.lineTo(points[i].x, points[i].y);
       ctx.stroke();
     }
-  }    
+  }
+  if(contadorPontos > 3) {
+    calcAvaliable();
+  }
 }
 
-function drawCurve(){    
-    var pointsCurve = [];
-    for(t = 0; t < 1; t = t + t/av){
-        //para cada avaliacao:
-        for(n = 1; n < contadorPontos; n++){
-            //para cada nivel:             
-            for(p = 0; p < contadorPontos - n; p++){
-                //para cada ponto:    
-            }
-        }
+function calcAvaliable() {
+  var pointsCurve = [];
+  //para cada avaliacao:
+  //var t = 1/2;
+  for(t = 0; t < 1; t = t + 1/av) {
+    var pointsDeCasteljau = points.slice(0, contadorPontos + 1);
+    //para cada nivel:
+    for(n = 1; n < contadorPontos; n++) {
+      //para cada ponto:
+      for(p = 0; p < contadorPontos - n; p++) {
+        var cordX = (1 - t) * pointsDeCasteljau[p].x + t * pointsDeCasteljau[p+1].x;
+        var cordY = (1 - t) * pointsDeCasteljau[p].y + t * pointsDeCasteljau[p+1].y;
+        pointsDeCasteljau[p] = {x: cordX, y: cordY};
+      }
     }
+    pointsCurve.push(pointsDeCasteljau[0]);
+  }
+  drawCurve(pointsCurve);
+}
+
+function drawCurve(pointsCurve) {
+  if(contadorPontos > 3) {
+    for(var i in pointsCurve) {
+      ctx.beginPath();
+      
+      if(i > 0) {
+        var xAtual = pointsCurve[i-1].x;
+        var yAtual = pointsCurve[i-1].y;
+        ctx.moveTo(xAtual, yAtual);
+        ctx.lineTo(pointsCurve[i].x, pointsCurve[i].y);
+        ctx.stroke();
+      }
+    }
+  }
 }
 
 //pega dist entre dois pontos
@@ -94,6 +120,7 @@ canvas.addEventListener('dblclick', e => {
   if (index !== -1) {
     points.splice(index, 1);
     //falta remover o ponto C1
+    contadorPontos--;
     drawPoints();
   }
 });
