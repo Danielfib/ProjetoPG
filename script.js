@@ -53,6 +53,8 @@ function resizeCanvas() {
 resizeCanvas();
 
 function drawPoints() {
+    //antes de desenhar a curva apaga tudo:
+  ctx.clearRect(0, 0, canvas.width, canvas.height);//redesenha o 
   //desenha todos os pontos
   for (var i in points) {
     ctx.beginPath();
@@ -163,7 +165,6 @@ canvas.addEventListener('mousemove', e => {
     var antigo = points[index];
     points[index] = {x: e.offsetX, y: e.offsetY, v:{x:0 , y:0}};
     points[index].v = {x: e.offsetX - antigo.x, y: e.offsetY - antigo.y};
-    ctx.clearRect(0, 0, canvas.width, canvas.height);//redesenha o 
     drawPoints();
   }     
 });
@@ -171,6 +172,5 @@ canvas.addEventListener('mousemove', e => {
 //intervalo de redesenho do canvas
 //a ultima linha contem a quant de milissegundos entre cada acao
 setInterval(() => {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);//redesenha o canvas
   drawPoints();
 }, 1000);
