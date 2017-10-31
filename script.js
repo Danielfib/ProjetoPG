@@ -11,7 +11,7 @@ slider.oninput = function() {
     //output.innerHTML = this.value;
     valorSlider = this.value;
     console.log(valorSlider);
-}
+};
 //-----------------------------------------------------------------
 //---------------------------TOGGLE--------------------------------
 //variavel que diz o metodo de calculo de derivadas escolhido:
@@ -82,12 +82,12 @@ function calcAvaliable() {
   var pointsCurve = [];
   //para cada avaliacao:
   //var t = 1/2;
-  for(t = 0; t < 1; t = t + 1/av) {
+  for(var t = 0; t < 1; t = t + 1/av) {
     //para cada avaliacao:
     var pointsDeCasteljau = points.slice(0, contadorPontos + 1);
-    for(n = 1; n < contadorPontos; n++) {
+    for(var n = 1; n < contadorPontos; n++) {
       //para cada nivel:
-      for(p = 0; p < contadorPontos - n; p++) {
+      for(var p = 0; p < contadorPontos - n; p++) {
         //para cada ponto:
         var cordX = (1 - t) * pointsDeCasteljau[p].x + t * pointsDeCasteljau[p+1].x;
         var cordY = (1 - t) * pointsDeCasteljau[p].y + t * pointsDeCasteljau[p+1].y;
@@ -162,7 +162,8 @@ canvas.addEventListener('mousemove', e => {
   if(move){
     var antigo = points[index];
     points[index] = {x: e.offsetX, y: e.offsetY, v:{x:0 , y:0}};
-    points[index].v = {x: e.offsetX - antigo.x, y: e.offsetY - antigo.y}
+    points[index].v = {x: e.offsetX - antigo.x, y: e.offsetY - antigo.y};
+    ctx.clearRect(0, 0, canvas.width, canvas.height);//redesenha o 
     drawPoints();
   }     
 });
@@ -172,4 +173,4 @@ canvas.addEventListener('mousemove', e => {
 setInterval(() => {
   ctx.clearRect(0, 0, canvas.width, canvas.height);//redesenha o canvas
   drawPoints();
-}, 100);
+}, 1000);
