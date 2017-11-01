@@ -1,17 +1,22 @@
 var canvas = document.getElementById('canvas');
 var ctx = canvas.getContext('2d');
 
-//----------------------------SLIDER------------------------------- 
-var slider = document.getElementById("myRange");
-//variaquel que armazena o valor do slider:
-//o valor inicial eh 50
-var valorSlider = 50;
-// Update the current slider value (each time you drag the slider handle)
-slider.oninput = function() {
-    //output.innerHTML = this.value;
-    valorSlider = this.value;
-    console.log(valorSlider);
-};
+//----------------------------SLIDERS-----------------------------
+//array com o valor de cada u:
+var arrayUs = [];
+var idSliders = 0;
+function addSlider(){
+    arrayUs[idSliders] = 50;
+    $("#slider").append('<div style="margin: 2px" class="slidecontainer">\
+        <input type="range" oninput="setSliderValue(' + idSliders + ')" min="1" max="100" value="50" class="slider" id="' + idSliders++ + '">\
+        ' + idSliders + '</div>');
+}
+function setSliderValue(idAtual){
+    var slider = document.getElementById(idAtual);
+    //array guarda o valor do slider em posicao(que eh o id do slider)
+    arrayUs[idAtual] = slider.value; 
+    //console.log(slider.value, idAtual);
+}
 //-----------------------------------------------------------------
 //---------------------------TOGGLE--------------------------------
 //variavel que diz o metodo de calculo de derivadas escolhido:
@@ -30,6 +35,7 @@ function toggle() {
 var isChecked = 0;
 //0 === nao marcado   | 1 === marcado
 function check(){
+    
     if (isChecked === 0){
         isChecked = 1;
     } else {
@@ -37,7 +43,7 @@ function check(){
     }
     console.log(isChecked);
 }
-//-----------------------------------------------------------------
+//---------------------------------------------------------------
 
 var av = 1000;//numero de avaliacao(vai ser escolhido pelo usuario)
 var contadorPontos = 0;
@@ -54,30 +60,30 @@ resizeCanvas();
 
 function drawPoints() {
     //antes de desenhar a curva apaga tudo:
-  ctx.clearRect(0, 0, canvas.width, canvas.height);//redesenha o 
-  //desenha todos os pontos
-  for (var i in points) {
-    ctx.beginPath();
-    ctx.arc(points[i].x, points[i].y, 5, 0, 2 * Math.PI);
-    ctx.fillStyle = '#ff8a80';
-    ctx.fill();
+    ctx.clearRect(0, 0, canvas.width, canvas.height);//redesenha o 
+    //desenha todos os pontos
+    for (var i in points) {
+        ctx.beginPath();
+        ctx.arc(points[i].x, points[i].y, 5, 0, 2 * Math.PI);
+        ctx.fillStyle = '#ff8a80';
+        ctx.fill();
 
-    //ligando os pontos
-    if(i > 0){
-        var xAtual = points[i-1].x;
-        var yAtual = points[i-1].y;
-        //deixando a linha tracejada
-        ctx.setLineDash([5 ,3]);
-        ctx.lineWidth = 0.5;
-        ctx.strokeStyle = '#90A4AE';
-        ctx.moveTo(xAtual, yAtual);
-        ctx.lineTo(points[i].x, points[i].y);
-        ctx.stroke();
+        //ligando os pontos
+        if(i > 0){
+            var xAtual = points[i-1].x;
+            var yAtual = points[i-1].y;
+            //deixando a linha tracejada
+            ctx.setLineDash([5 ,3]);
+            ctx.lineWidth = 0.5;
+            ctx.strokeStyle = '#90A4AE';
+            ctx.moveTo(xAtual, yAtual);
+            ctx.lineTo(points[i].x, points[i].y);
+            ctx.stroke();
+        }
     }
-  }
-  if(contadorPontos > 3) {
-    calcAvaliable();
-  }
+    if(contadorPontos > 3) {
+        calcAvaliable();
+    }
 }
 
 function calcAvaliable() {
@@ -102,6 +108,7 @@ function calcAvaliable() {
 }
 
 function drawCurve(pointsCurve) {
+    console.log();
   if(contadorPontos > 3) {
     for(var i in pointsCurve) {
       ctx.beginPath();
@@ -140,6 +147,7 @@ canvas.addEventListener('mousedown', e => {
   index = getIndex(click);
   if (index === -1) {
     contadorPontos = contadorPontos + 1;
+    addSlider();
     points.push(click);
     drawPoints();
   } else {
