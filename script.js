@@ -1,25 +1,121 @@
 var canvas = document.getElementById('canvas');
 var ctx = canvas.getContext('2d');
 
-//----------------------------SLIDER-------------------------------
-var slider = document.getElementById("myRange");
-var output = document.getElementById("demo");
-//DA ERRO QUANDO DESCOMENTA AQUI
-//output.innerHTML = slider.value; // Display the default slider value
-
-// Update the current slider value (each time you drag the slider handle)
-//slider.oninput = function() {
-//    output.innerHTML = this.value;
-//}
-//-----------------------------------------------------------------
-
-var av = 1000;//numero de avaliacao(vai ser escolhido pelo usuario)
-var contadorPontos = 0;
-var points = [];//array dos pontos colocados pelo usuario
+var av = 1000; //numero de avaliacao(vai ser escolhido pelo usuario)
+var qtdPontosJuncao = 0;
+var points = []; //array dos pontos colocados pelo usuario
+var pointsBezier = []; //pontos de controle de Bezier
+var arrayUs = [0, 1, 3]; //Us
+var intervals = []; //deltas
+var vetores = []; //vetores
+var alfas = []; //alfas para bessel
 var move = false; //usado no mover ponto
 var index = -1; //o getIndex itera ela, e ela serve pro clique do mouse
 
+function calcIntervals() {
+  for(i = 0; i < arrayUs.length - 1; i++) {
+    intervals[i] = arrayUs[i+1] - arrayUs[i];
+  }
+}
+
+function calcAlfas() {
+  calcIntervals();
+  for(i = 1; i < qtdPontosJuncao - 1; i++) {
+    alfas[i] = intervals[i-1] / (intervals[i-1] + intervals[i]);
+  }
+}
+
+/**
+ * Fechada - Bessel e Fmill
+ * Aberta - Bessel
+ */
+
+function besselTangents() {
+  var vetFirst, nextVet;
+  var constFirst, constNext;
+  var X, Y;
+  var L = qtdPontosJuncao - 1;
+
+  calcAlfas();
+
+  for(i = 1; i < L; i++) {
+    vetFirst = {x: points[i].x - points[i-1].x, y: points[i].y - points[i-1].y};
+    nextVet = {x: points[i+1].x - points[i].x, y: points[i+1].y - points[i].y};
+    constFirst = (1 - alfas[i]) / intervals[i-1];
+    constNext = alfas[i] / intervals[i];
+    X = constFirst * vetFirst.x + constNext * nextVet.x;
+    Y = constFirst * vetFirst.y + constNext * nextVet.y;
+    vetores[i] = {x: X, y: Y};
+  }
+
+  // calculando os vetores dos extremos
+  if(qtdPontosJuncao > 2) {
+    var vet;
+
+    constFirst = 2 / intervals[0];
+    vet = {x: points[1].x - points[0].x, y: points[1].y - points[0].y};
+    X = constFirst * vet.x - vetores[1].x;
+    Y = constFirst * vet.y - vetores[1].y;
+    vetores[0] = {x: X, y: Y};
+
+    constFirst = 2 / intervals[L-1];
+    vet = {x: points[L].x - points[L-1].x, y: points[L].y - points[L-1].y};
+    X = constFirst * vet.x - vetores[L-1].x;
+    Y = constFirst * vet.y - vetores[L-1].y;
+    vetores[L] = {x: X, y: Y};
+
+    calcExtremePointsBezir();
+    calcIntermediatePointsBezir();
+
+    calcAvaliable();
+  }
+}
+
+function fmillTangents() {
+  var X, Y;
+
+  for(i = 1; i < qtdPontosJuncao - 1; i++) {
+    X = points[i+1].x - points[i-1].x;
+    Y = points[i+1].y - points[i-1].y;
+    vetores[i] = {x: X, y: Y};
+  }
+}
+
+function calcExtremePointsBezir() {
+  var X, Y;
+  pointsBezier[0] = {x: points[0].x, y: points[0].y};
+  X = points[0].x + vetores[0].x;
+  Y = points[0].y + vetores[0].y;
+  pointsBezier[1] = {x: X, y: Y};
+
+  var L = qtdPontosJuncao - 1;
+  pointsBezier[3*L] = {x: points[L].x, y: points[L].y};
+  X = points[L].x - vetores[L].x;
+  Y = points[L].y - vetores[L].y;
+  pointsBezier[3*L-1] = {x: X, y: Y};
+}
+
+function calcIntermediatePointsBezir() {
+  var X, Y;
+  var coef;
+  var L = qtdPontosJuncao - 1;
+  for (i = 1; i < L; i++) {
+    coef = intervals[i-1] / (3 * (intervals[i-1] + intervals[i]));
+    X = points[i].x - coef * vetores[i].x;
+    Y = points[i].y - coef * vetores[i].y;
+    pointsBezier[3*i - 1] = {x: X, y: Y};
+
+    pointsBezier[3*i] = {x: points[i].x, y: points[i].y};
+
+    coef = intervals[i] / (3 * (intervals[i-1] + intervals[i]));
+    X = points[i].x + coef * vetores[i].x;
+    Y = points[i].y + coef * vetores[i].y;
+    pointsBezier[3*i + 1] = {x: X, y: Y};
+  }
+}
+
 resizeCanvas();
+
 
 function resizeCanvas() {
   canvas.width = parseFloat(window.getComputedStyle(canvas).width);
@@ -28,58 +124,79 @@ function resizeCanvas() {
 
 function drawPoints() {
   //desenha todos os pontos
-  for (var i in points) {
+  var cor;
+  for (var i in pointsBezier) {
     ctx.beginPath();
-    ctx.arc(points[i].x, points[i].y, 5, 0, 2 * Math.PI);
-    ctx.fillStyle = 'red';
+    ctx.arc(pointsBezier[i].x, pointsBezier[i].y, 5, 0, 2 * Math.PI);
+    if(i < 3) {
+      cor = 'blue';
+    } else {
+      if(i == 3) {
+        cor = 'red';
+      } else {
+        cor = 'green';
+      }
+    }
+    ctx.fillStyle = cor;
     ctx.fill();
 
-    //ligando os pontos
-    if(i > 0){
+  }
+  
+  //ligando os pontos
+  /*for(var i in points) {
+    if(i > 0) {
       var xAtual = points[i-1].x;
       var yAtual = points[i-1].y;
       ctx.moveTo(xAtual, yAtual);
       ctx.lineTo(points[i].x, points[i].y);
       ctx.stroke();
     }
-  }
-  if(contadorPontos > 3) {
-    calcAvaliable();
-  }
+  }*/
 }
 
 function calcAvaliable() {
-  var pointsCurve = [];
-  //para cada avaliacao:
-  //var t = 1/2;
-  for(t = 0; t < 1; t = t + 1/av) {
-    var pointsDeCasteljau = points.slice(0, contadorPontos + 1);
-    //para cada nivel:
-    for(n = 1; n < contadorPontos; n++) {
-      //para cada ponto:
-      for(p = 0; p < contadorPontos - n; p++) {
-        var cordX = (1 - t) * pointsDeCasteljau[p].x + t * pointsDeCasteljau[p+1].x;
-        var cordY = (1 - t) * pointsDeCasteljau[p].y + t * pointsDeCasteljau[p+1].y;
-        pointsDeCasteljau[p] = {x: cordX, y: cordY};
+  var limInf, limSup;
+  var i = 0;
+  
+  while(i < qtdPontosJuncao - 1) {
+    var pointsCurve = [];
+    limInf = 3 * i;
+    limSup = limInf + 3;
+
+    //para cada avaliacao:
+    for(t = 0; t <= 1; t = t + 1/av) {
+      var pointsDeCasteljau = [];
+      
+      for(j = limInf; j <= limSup; j++) {
+        pointsDeCasteljau.push({x: pointsBezier[j].x, y: pointsBezier[j].y});
       }
+      //para cada nivel:
+      for(n = 1; n < pointsDeCasteljau.length; n++) {
+        //para cada ponto:
+        for(p = 0; p < pointsDeCasteljau.length - n; p++) {
+          var cordX = (1 - t) * pointsDeCasteljau[p].x + t * pointsDeCasteljau[p+1].x;
+          var cordY = (1 - t) * pointsDeCasteljau[p].y + t * pointsDeCasteljau[p+1].y;
+          pointsDeCasteljau[p] = {x: cordX, y: cordY};
+        }
+      }
+      pointsCurve.push(pointsDeCasteljau[0]);
     }
-    pointsCurve.push(pointsDeCasteljau[0]);
+    i++;
+    drawCurve(pointsCurve);
   }
-  drawCurve(pointsCurve);
 }
 
 function drawCurve(pointsCurve) {
-  if(contadorPontos > 3) {
-    for(var i in pointsCurve) {
-      ctx.beginPath();
+  drawPoints();
+  for(var i in pointsCurve) {
+    ctx.beginPath();
       
-      if(i > 0) {
-        var xAtual = pointsCurve[i-1].x;
-        var yAtual = pointsCurve[i-1].y;
-        ctx.moveTo(xAtual, yAtual);
-        ctx.lineTo(pointsCurve[i].x, pointsCurve[i].y);
-        ctx.stroke();
-      }
+    if(i > 0) {
+      var xAtual = pointsCurve[i-1].x;
+      var yAtual = pointsCurve[i-1].y;
+      ctx.moveTo(xAtual, yAtual);
+      ctx.lineTo(pointsCurve[i].x, pointsCurve[i].y);
+      ctx.stroke();
     }
   }
 }
@@ -104,9 +221,11 @@ canvas.addEventListener('mousedown', e => {
   var click = {x: e.offsetX, y: e.offsetY, v:{x: 0, y:0}};
   index = getIndex(click);
   if (index === -1) {
-    contadorPontos = contadorPontos + 1;
+    qtdPontosJuncao++;
     points.push(click);
-    drawPoints();
+    if(qtdPontosJuncao > 2) {
+      besselTangents();
+    }
   } else {
     move = true;
   }
@@ -120,8 +239,7 @@ canvas.addEventListener('dblclick', e => {
   if (index !== -1) {
     points.splice(index, 1);
     //falta remover o ponto C1
-    contadorPontos--;
-    drawPoints();
+    qtdPontosJuncao--;
   }
 });
 
@@ -139,5 +257,5 @@ canvas.addEventListener('mousemove', e => {
 //a ultima linha contem a quant de milissegundos entre cada acao
 setInterval(() => {
   ctx.clearRect(0, 0, canvas.width, canvas.height);//redesenha o canvas
-  drawPoints();
+  besselTangents();
 }, 100);
