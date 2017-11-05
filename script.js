@@ -5,7 +5,7 @@ var av = 1000; //numero de avaliacao(vai ser escolhido pelo usuario)
 var qtdPontosJuncao = 0;
 var points = []; //array dos pontos colocados pelo usuario
 var pointsBezier = []; //pontos de controle de Bezier
-var arrayUs = [150, 151, 153, 156]; //Us
+var arrayUs = [150, 151, 153, 156, 160]; //Us
 var intervals = []; //deltas
 var vetores = []; //vetores
 var alfas = []; //alfas para bessel
@@ -64,8 +64,8 @@ function besselTangents() {
     Y = constFirst * vet.y - vetores[L-1].y;
     vetores[L] = {x: X, y: Y};
     
-    calcExtremePointsBezir();
     calcIntermediatePointsBezir();
+    calcExtremePointsBezir();
   }
 }
 
@@ -81,16 +81,28 @@ function fmillTangents() {
 
 function calcExtremePointsBezir() {
   var X, Y;
-  pointsBezier[0] = {x: points[0].x, y: points[0].y};
-  X = points[0].x + vetores[0].x;
-  Y = points[0].y + vetores[0].y;
+  var coef;
+  var L = qtdPontosJuncao - 1;
+
+  coef = intervals[L-2] / (3 * (intervals[L-2] + intervals[L-1]));
+  X = points[L].x - coef * vetores[L].x;
+  Y = points[L].y - coef * vetores[L].y;
+  pointsBezier[3*L - 1] = {x: X, y: Y};
+
+  coef = intervals[0] / (3 * (intervals[0]));
+  X = points[0].x + coef * vetores[0].x;
+  Y = points[0].y + coef * vetores[0].y;
   pointsBezier[1] = {x: X, y: Y};
 
-  var L = qtdPontosJuncao - 1;
+  pointsBezier[0] = {x: points[0].x, y: points[0].y};
+  /*X = //points[0].x + vetores[0].x;
+  Y = //points[0].y + vetores[0].y;
+  pointsBezier[1] = {x: X, y: Y};*/
+  
   pointsBezier[3*L] = {x: points[L].x, y: points[L].y};
-  X = points[L].x - vetores[L].x;
-  Y = points[L].y - vetores[L].y;
-  pointsBezier[3*L-1] = {x: X, y: Y};
+  /*X = //points[L].x - vetores[L].x;
+  Y = //points[L].y - vetores[L].y;
+  pointsBezier[3*L-1] = {x: X, y: Y};*/
 }
 
 function calcIntermediatePointsBezir() {
@@ -212,8 +224,9 @@ canvas.addEventListener('mousedown', e => {
   var click = {x: e.offsetX, y: e.offsetY, v:{x: 0, y:0}};
   index = getIndex(click);
   if (index === -1) {
+    //points.push(click);
+    points[qtdPontosJuncao] = click;
     qtdPontosJuncao++;
-    points.push(click);
     if(qtdPontosJuncao > 2) {
       besselTangents();
       drawPoints();
