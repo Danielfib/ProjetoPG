@@ -197,11 +197,13 @@ canvas.addEventListener('dblclick', e => {
         arrayValoresSliders.splice(index, 1);
         arrayUs.splice(index, 1);
         calcUs();
-        //as vezes n remove o slider pq remove o ponto do array
-        //mas o id n muda, ai se confunde
+        
         $("#" +index).remove();
+        //reetiqueta os sliders quando um for removido:
+        for(var i = index; i < contadorPontos+1; i++){
+            $("#" + i).attr('id', i-1);
+        }
     }
-    console.log(index);
 });
 
 //mover
