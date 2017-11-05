@@ -64,8 +64,9 @@ function besselTangents() {
     Y = constFirst * vet.y - vetores[L-1].y;
     vetores[L] = {x: X, y: Y};
     
-    calcIntermediatePointsBezir();
     calcExtremePointsBezir();
+    fmillTangents();
+    calcIntermediatePointsBezir();
   }
 }
 
@@ -84,7 +85,7 @@ function calcExtremePointsBezir() {
   var coef;
   var L = qtdPontosJuncao - 1;
 
-  coef = intervals[L-2] / (3 * (intervals[L-2] + intervals[L-1]));
+  coef = intervals[L-1] / 3;
   X = points[L].x - coef * vetores[L].x;
   Y = points[L].y - coef * vetores[L].y;
   pointsBezier[3*L - 1] = {x: X, y: Y};
