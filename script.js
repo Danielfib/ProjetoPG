@@ -1,21 +1,43 @@
 var canvas = document.getElementById('canvas');
 var ctx = canvas.getContext('2d');
 
-//----------------------------SLIDERS-----------------------------
-//array com o valor de cada u:
-var arrayUs = [];
+//----------------------------SLIDERS----------------------------
+//array com o valor de cada intervalo:
+//inicia os valores iniciais dos us no array:
+
+var arrayValoresSliders = [];
 var idSliders = 0;
 function addSlider(){
-    arrayUs[idSliders] = 50;
+    arrayValoresSliders[idSliders] = 50;
     $("#slider").append('<div style="margin: 2px" class="slidecontainer">\
         <input type="range" oninput="setSliderValue(' + idSliders + ')" min="1" max="100" value="50" class="slider" id="' + idSliders++ + '">\
-        ' + idSliders + '</div>');
+        ' + "u" + (idSliders-1) + '</div>');
 }
 function setSliderValue(idAtual){
     var slider = document.getElementById(idAtual);
     //array guarda o valor do slider em posicao(que eh o id do slider)
-    arrayUs[idAtual] = slider.value; 
+    arrayValoresSliders[idAtual] = parseInt(slider.value); 
     //console.log(slider.value, idAtual);
+    calcUs();
+}
+
+function calcUs(){
+    //calcula o valor de cada u
+    //(soma com os anteriores)
+    //como o intervalo entre os us é o valor do slider,
+    //essa funcao só calcula os valores de cada u
+    for (var i = 0; i < contadorPontos; i++){
+        arrayUs[i] = calcU(i);
+    }
+}
+
+function calcU(i) {
+    if (i === 0){
+        return arrayValoresSliders[0];
+    } else {
+        return arrayValoresSliders[i] + arrayUs[i-1];
+    }
+    
 }
 //-----------------------------------------------------------------
 //---------------------------TOGGLE--------------------------------
@@ -38,18 +60,23 @@ function check(){
     
     if (isChecked === 0){
         isChecked = 1;
+        $("#botaoToggle").css("background-color", "#4CAF50");
     } else {
         isChecked = 0;
+        $("#botaoToggle").css("background-color", "#90A4AE");
     }
-    console.log(isChecked);
+    //console.log(isChecked);
 }
 //---------------------------------------------------------------
-
 var av = 1000;//numero de avaliacao(vai ser escolhido pelo usuario)
 var contadorPontos = 0;
 var points = [];//array dos pontos colocados pelo usuario
 var move = false; //usado no mover ponto
 var index = -1; //o getIndex itera ela, e ela serve pro clique do mouse
+
+//array com o valor de cada u:
+var arrayUs = [];
+
 
 function resizeCanvas() {
   canvas.width = parseFloat(window.getComputedStyle(canvas).width);
@@ -140,7 +167,7 @@ function getIndex(click) {
     }
   }
   return -1;
-}
+} 
 
 canvas.addEventListener('mousedown', e => {
   var click = {x: e.offsetX, y: e.offsetY, v:{x: 0, y:0}};
@@ -149,6 +176,7 @@ canvas.addEventListener('mousedown', e => {
     contadorPontos = contadorPontos + 1;
     addSlider();
     points.push(click);
+    calcUs();
     drawPoints();
   } else {
     move = true;
@@ -160,11 +188,20 @@ canvas.addEventListener('mouseup', e => {
 });
 
 canvas.addEventListener('dblclick', e => {
-  if (index !== -1) {
-    points.splice(index, 1);
-    //falta remover o ponto C1
-    contadorPontos--;
-  }
+    if (index !== -1) {
+        //se o double clique for "emcima" de um ponto valido
+        points.splice(index, 1);
+        contadorPontos--;
+        
+        //para apagar o u:
+        arrayValoresSliders.splice(index, 1);
+        arrayUs.splice(index, 1);
+        calcUs();
+        //as vezes n remove o slider pq remove o ponto do array
+        //mas o id n muda, ai se confunde
+        $("#" +index).remove();
+    }
+    console.log(index);
 });
 
 //mover
