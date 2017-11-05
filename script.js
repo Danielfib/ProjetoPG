@@ -5,7 +5,7 @@ var av = 1000; //numero de avaliacao(vai ser escolhido pelo usuario)
 var qtdPontosJuncao = 0;
 var points = []; //array dos pontos colocados pelo usuario
 var pointsBezier = []; //pontos de controle de Bezier
-var arrayUs = [0, 1, 3]; //Us
+var arrayUs = [150, 151, 153, 156]; //Us
 var intervals = []; //deltas
 var vetores = []; //vetores
 var alfas = []; //alfas para bessel
@@ -63,11 +63,9 @@ function besselTangents() {
     X = constFirst * vet.x - vetores[L-1].x;
     Y = constFirst * vet.y - vetores[L-1].y;
     vetores[L] = {x: X, y: Y};
-
+    
     calcExtremePointsBezir();
     calcIntermediatePointsBezir();
-
-    calcAvaliable();
   }
 }
 
@@ -116,7 +114,6 @@ function calcIntermediatePointsBezir() {
 
 resizeCanvas();
 
-
 function resizeCanvas() {
   canvas.width = parseFloat(window.getComputedStyle(canvas).width);
   canvas.height = parseFloat(window.getComputedStyle(canvas).height);
@@ -128,18 +125,13 @@ function drawPoints() {
   for (var i in pointsBezier) {
     ctx.beginPath();
     ctx.arc(pointsBezier[i].x, pointsBezier[i].y, 5, 0, 2 * Math.PI);
-    if(i < 3) {
-      cor = 'blue';
+    if(i % 3 == 0) {
+      cor = 'red';
     } else {
-      if(i == 3) {
-        cor = 'red';
-      } else {
-        cor = 'green';
-      }
+      cor = 'blue';
     }
     ctx.fillStyle = cor;
     ctx.fill();
-
   }
   
   //ligando os pontos
@@ -152,42 +144,41 @@ function drawPoints() {
       ctx.stroke();
     }
   }*/
+  for(var j = 0; j < qtdPontosJuncao - 1; j++) {
+    var limInf = 3 * j;
+    var limSup = limInf + 3;
+    var array = [];
+    for (var k = limInf; k <= limSup; k++) {
+      array.push({x: pointsBezier[k].x, y: pointsBezier[k].y});
+    }
+    makeCurve(array);
+  }
 }
 
-function calcAvaliable() {
-  var limInf, limSup;
-  var i = 0;
-  
-  while(i < qtdPontosJuncao - 1) {
-    var pointsCurve = [];
-    limInf = 3 * i;
-    limSup = limInf + 3;
-
-    //para cada avaliacao:
-    for(t = 0; t <= 1; t = t + 1/av) {
-      var pointsDeCasteljau = [];
-      
-      for(j = limInf; j <= limSup; j++) {
-        pointsDeCasteljau.push({x: pointsBezier[j].x, y: pointsBezier[j].y});
-      }
-      //para cada nivel:
-      for(n = 1; n < pointsDeCasteljau.length; n++) {
-        //para cada ponto:
-        for(p = 0; p < pointsDeCasteljau.length - n; p++) {
-          var cordX = (1 - t) * pointsDeCasteljau[p].x + t * pointsDeCasteljau[p+1].x;
-          var cordY = (1 - t) * pointsDeCasteljau[p].y + t * pointsDeCasteljau[p+1].y;
-          pointsDeCasteljau[p] = {x: cordX, y: cordY};
-        }
-      }
-      pointsCurve.push(pointsDeCasteljau[0]);
+function makeCurve(array) {
+  var pointsCurve = [];
+  for(t = 0; t <= 1; t = t + 1/av) {
+    var pointsDeCasteljau = [];
+    for(var i = 0; i < array.length; i++) {
+      pointsDeCasteljau.push({x: array[i].x, y: array[i].y});
     }
-    i++;
-    drawCurve(pointsCurve);
+    calcAvaliable(pointsDeCasteljau, t);
+    pointsCurve.push(pointsDeCasteljau[0]);
+  }
+  drawCurve(pointsCurve);
+}
+
+function calcAvaliable(pointsDeCasteljau, t) {
+  for(n = 1; n < pointsDeCasteljau.length; n++) {
+    for(p = 0; p < pointsDeCasteljau.length - n; p++) {
+      var cordX = (1 - t) * pointsDeCasteljau[p].x + t * pointsDeCasteljau[p+1].x;
+      var cordY = (1 - t) * pointsDeCasteljau[p].y + t * pointsDeCasteljau[p+1].y;
+      pointsDeCasteljau[p] = {x: cordX, y: cordY};
+    }
   }
 }
 
 function drawCurve(pointsCurve) {
-  drawPoints();
   for(var i in pointsCurve) {
     ctx.beginPath();
       
@@ -225,6 +216,7 @@ canvas.addEventListener('mousedown', e => {
     points.push(click);
     if(qtdPontosJuncao > 2) {
       besselTangents();
+      drawPoints();
     }
   } else {
     move = true;
@@ -249,7 +241,10 @@ canvas.addEventListener('mousemove', e => {
     var antigo = points[index];
     points[index] = {x: e.offsetX, y: e.offsetY, v:{x:0 , y:0}};
     points[index].v = {x: e.offsetX - antigo.x, y: e.offsetY - antigo.y}
-    drawPoints();
+    if(qtdPontosJuncao > 2) {
+      besselTangents();
+      drawPoints();
+    }
   }     
 });
 
@@ -257,5 +252,8 @@ canvas.addEventListener('mousemove', e => {
 //a ultima linha contem a quant de milissegundos entre cada acao
 setInterval(() => {
   ctx.clearRect(0, 0, canvas.width, canvas.height);//redesenha o canvas
-  besselTangents();
+  if(qtdPontosJuncao > 2) {
+    besselTangents();
+    drawPoints();
+  }
 }, 100);
