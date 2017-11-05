@@ -43,7 +43,7 @@ function calcU(i) {
 //---------------------------TOGGLE--------------------------------
 //variavel que diz o metodo de calculo de derivadas escolhido:
 var isToggle = 0;
-//0 === FMILL   |    1 === Bessel
+//1 === FMILL   |    0 === Bessel
 function toggle() {
     if(isToggle === 0){
         isToggle = 1;
