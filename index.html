@@ -9,7 +9,29 @@
     <body>
         <div id="slider">
         </div>
-        <div style="margin: 20px; " id="derivadasEToggle">
+        <div style="margin: 20px">
+            Informe o número de avaliações desejadas e clique no botão(começa com 1000):<br>
+            <button id="menos100" style="height: 20px; width: 50px; margin-top:  10px" onclick="setAvaMenos100()">
+                -100
+            </button>
+            <button id="menos10" style="height: 20px; width: 50px; margin-top:  10px" onclick="setAvaMenos10()">
+                -10
+            </button>
+            <button id="menos2" style="height: 20px; width: 50px; margin-top:  10px" onclick="setAvaMenos2()">
+                -2
+            </button>
+            <input style="margin: 5px" type="text" id = "qtdAva" value = "1000">
+            <button id="mais2" style="height: 20px; width: 50px; margin-top:  10px" onclick="setAvaMais2()">
+                +2
+            </button>
+            <button id="mais10" style="height: 20px; width: 50px; margin-top:  10px" onclick="setAvaMais10()">
+                +10
+            </button>
+            <button id="mais100" style="height: 20px; width: 50px; margin-top:  10px" onclick="setAvaMais100()">
+                +100
+            </button>
+        </div>
+        <div style="margin: 20px; opacity: 0.35" id="derivadasEToggle">
             <div style="margin-top: 7px" class="FMILL">
                 Bessel
             </div>
@@ -28,15 +50,8 @@
             <input onclick="check()" id="checkBox" type="checkbox">
             Desejo que a curva seja fechada!
         </div>
+        
         <canvas id="canvas"></canvas>
     </body>
     <script src="script.js"></script>
 </html>
-
-
-
-<!--->
-o algoritmo de desenho da curva de bezier é
-para t = 0, até t=1, faz as avaliacoes e e pegas os varios pontos da curva.
-ligando todos esses pontos desenha a curva de Bezier
-<---->

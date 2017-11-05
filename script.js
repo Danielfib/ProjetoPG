@@ -11,7 +11,33 @@ var vetores = []; //vetores
 var alfas = []; //alfas para bessel
 var move = false; //usado no mover ponto
 var index = -1; //o getIndex itera ela, e ela serve pro clique do mouse
+//--------------------INPUT DE AVALIACAO-------------------------
+function setAvaMenos100() {
+    av = av - 100;
+    $("#qtdAva").attr("value", av);
+}
+function setAvaMenos10() {
+    av = av - 10;
+    $("#qtdAva").attr("value", av);
+}
+function setAvaMenos2() {
+    av = av - 2;
+    $("#qtdAva").attr("value", av);
+}
+function setAvaMais2() {
+    av = av + 2;
+    $("#qtdAva").attr("value", av);
+}
+function setAvaMais10() {
+    av = av + 10;
+    $("#qtdAva").attr("value", av);
+}
+function setAvaMais100() {
+    av = av + 100;
+    $("#qtdAva").attr("value", av);
+}
 
+//---------------------------------------------------------------
 //----------------------------SLIDERS----------------------------
 //array com o valor de cada intervalo:
 //inicia os valores iniciais dos us no array:
@@ -19,7 +45,7 @@ var index = -1; //o getIndex itera ela, e ela serve pro clique do mouse
 var arrayValoresSliders = [];
 var idSliders = 0;
 function addSlider(){
-    arrayValoresSliders[idSliders] = 50;
+    arrayValoresSliders[idSliders] = 50 / 30;
     $("#slider").append('<div style="margin: 2px" class="slidecontainer">\
         <input type="range" oninput="setSliderValue(' + idSliders + ')" min="1" max="100" value="50" class="slider" id="' + idSliders++ + '">\
         ' + "u" + (idSliders-1) + '</div>');
@@ -27,7 +53,7 @@ function addSlider(){
 function setSliderValue(idAtual){
     var slider = document.getElementById(idAtual);
     //array guarda o valor do slider em posicao(que eh o id do slider)
-    arrayValoresSliders[idAtual] = parseInt(slider.value); 
+    arrayValoresSliders[idAtual] = parseInt(slider.value) / 30; 
     //console.log(slider.value, idAtual);
     calcUs();
 }
@@ -71,9 +97,11 @@ function check(){
     if (isChecked === 0){
         isChecked = 1;
         $("#botaoToggle").css("background-color", "#4CAF50");
+        $("#derivadasEToggle").css("opacity", 1);
     } else {
         isChecked = 0;
         $("#botaoToggle").css("background-color", "#90A4AE");
+        $("#derivadasEToggle").css("opacity", 0.35);
     }
     //console.log(isChecked);
 }

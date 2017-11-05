@@ -38,6 +38,7 @@ html, body, canvas {
     width: 15px; /* Set a specific slider handle width */
     height: 15px; /* Slider handle height */
     border-radius: 50%;
+    opacity: 1;
     background: #4CAF50; /* Green background */
     cursor: pointer; /* Cursor on hover */
 }
@@ -46,6 +47,7 @@ html, body, canvas {
     width: 25px; /* Set a specific slider handle width */
     height: 25px; /* Slider handle height */
     border-radius: 50%;
+    opacity: 1;
     background: #4CAF50; /* Green background */
     cursor: pointer; /* Cursor on hover */
 }
@@ -70,6 +72,7 @@ html, body, canvas {
   right: 0;
   bottom: 0;
   background-color: #90A4AE;
+
   -webkit-transition: .4s;
   transition: .4s;
 }
@@ -95,6 +98,7 @@ input:checked + .sliderToggle {
 }
 
 input:focus + .sliderToggle {
+    opacity: 1;
   box-shadow: 0 0 1px #4CAF50;
 }
 
