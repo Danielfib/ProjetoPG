@@ -2,24 +2,62 @@
 <html>
     <head>
         <meta charset="utf-8">
-        <title> Interpolação de B-splines Cúbico C1 Interativo</title>
-        <link type="text/css" rel="stylesheet" href="style.css">    
+        <title> Interpolação de B-splines Cúbico C1 Interativo </title>
+        <link type="text/css" rel="stylesheet" href="style.css"> 
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     </head>
     <body>
-        oiiiiiiiiiiiiiiiiiiiiiiiii
-        <div id="slidecontainer">
-            <input type="range" min="1" max="100" value="50" class="slider" id="myRange">
+        <div id="slider">
+        </div>
+        <div style="margin: 20px">
+            Informe o número de avaliações desejadas clicando nos botões(começa com 500):<br>
+            <button id="menos100" style="height: 20px; width: 50px; margin-top:  10px" onclick="setAvaMenos100()">
+                -100
+            </button>
+            <button id="menos10" style="height: 20px; width: 50px; margin-top:  10px" onclick="setAvaMenos10()">
+                -10
+            </button>
+            <button id="menos2" style="height: 20px; width: 50px; margin-top:  10px" onclick="setAvaMenos2()">
+                -2
+            </button>
+            <input style="margin: 5px" type="text" id = "qtdAva" value = "500">
+            <button id="mais2" style="height: 20px; width: 50px; margin-top:  10px" onclick="setAvaMais2()">
+                +2
+            </button>
+            <button id="mais10" style="height: 20px; width: 50px; margin-top:  10px" onclick="setAvaMais10()">
+                +10
+            </button>
+            <button id="mais100" style="height: 20px; width: 50px; margin-top:  10px" onclick="setAvaMais100()">
+                +100
+            </button>
+        </div>
+        <div style="margin: 20px; opacity: 0.35" id="derivadasEToggle">
+            <div style="margin-top: 7px" class="FMILL">
+                Bessel
+            </div>
+            <!-- Rounded switch -->
+            <div class="FMILL">
+                <label style="margin-left: 10px; margin-right: 10px;" class="switchToggle">
+                    <input type="checkbox">
+                    <span id = "botaoToggle" onclick="toggle()" class="sliderToggle round"></span>
+                </label>
+            </div>
+            <div style="margin-top: 7px" class="FMILL">
+                FMILL
+            </div>
+        </div>
+        <div style="margin-left: 300px; margin-top: 27px">
+            <input onclick="check()" id="checkBox" type="checkbox">
+            Desejo que a curva seja fechada!
+        </div>
+        <div style="margin: 20px;">
+            Desejo esconder:<br>
+            <input onclick="checkPontos()" id="checkBoxPontos" type="checkbox">Pontos de Controle
+            <input style="margin-left: 15px" onclick="checkPoligonal()" id="checkBoxPoligonal" type="checkbox">
+            Poligonal de Controle
+            <input style="margin-left: 15px" onclick="checkCurva()" id="checkBoxCurva" type="checkbox">Curva de Bezier
         </div>
         <canvas id="canvas"></canvas>
-        <br><br><br><br><br><br><br>
     </body>
     <script src="script.js"></script>
 </html>
-
-
-
-<!--->
-o algoritmo de desenho da curva de bezier é
-para t = 0, até t=1, faz as avaliacoes e e pegas os varios pontos da curva.
-ligando todos esses pontos desenha a curva de Bezier
-<---->
