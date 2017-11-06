@@ -163,53 +163,116 @@ function toggleMethod() {
  */
 
 function besselTangents() {
-  var vetFirst, nextVet;
-  var constFirst, constNext;
-  var X, Y;
-  var L = qtdPontosJuncao - 1;
-
-  calcAlfas();
-
-  for(var i = 1; i < L; i++) {
-    vetFirst = {x: points[i].x - points[i-1].x, y: points[i].y - points[i-1].y};
-    nextVet = {x: points[i+1].x - points[i].x, y: points[i+1].y - points[i].y};
-    constFirst = (1 - alfas[i]) / intervals[i-1];
-    constNext = alfas[i] / intervals[i];
-    X = constFirst * vetFirst.x + constNext * nextVet.x;
-    Y = constFirst * vetFirst.y + constNext * nextVet.y;
-    vetores[i] = {x: X, y: Y};
-  }
-
-  // calculando os vetores dos extremos
-  if(qtdPontosJuncao > 2) {
-    var vet;
-
-    constFirst = 2 / intervals[0];
-    vet = {x: points[1].x - points[0].x, y: points[1].y - points[0].y};
-    X = constFirst * vet.x - vetores[1].x;
-    Y = constFirst * vet.y - vetores[1].y;
-    vetores[0] = {x: X, y: Y};
-
-    constFirst = 2 / intervals[L-1];
-    vet = {x: points[L].x - points[L-1].x, y: points[L].y - points[L-1].y};
-    X = constFirst * vet.x - vetores[L-1].x;
-    Y = constFirst * vet.y - vetores[L-1].y;
-    vetores[L] = {x: X, y: Y};
+    pointsBezier = [];
     
-    calcExtremePointsBezir();
+    var vetFirst, nextVet;
+    var constFirst, constNext;
+    var X, Y;
+    var L = qtdPontosJuncao - 1;
+    
+    calcAlfas();
+    
+    for(var i = 1; i < L; i++) {
+        vetFirst = {x: points[i].x - points[i-1].x, y: points[i].y - points[i-1].y};
+        nextVet = {x: points[i+1].x - points[i].x, y: points[i+1].y - points[i].y};
+        constFirst = (1 - alfas[i]) / intervals[i-1];
+        constNext = alfas[i] / intervals[i];
+        X = constFirst * vetFirst.x + constNext * nextVet.x;
+        Y = constFirst * vetFirst.y + constNext * nextVet.y;
+        vetores[i] = {x: X, y: Y};
+    }
+    
     calcIntermediatePointsBezir();
-  }
+
+    // calculando os vetores dos extremos
+    if(qtdPontosJuncao > 2) {
+        var vet;
+        if(isChecked === 0) {
+            constFirst = 2 / intervals[0];
+            vet = {x: points[1].x - points[0].x, y: points[1].y - points[0].y};
+            X = constFirst * vet.x - vetores[1].x;
+            Y = constFirst * vet.y - vetores[1].y;
+            vetores[0] = {x: X, y: Y};
+
+            constFirst = 2 / intervals[L-1];
+            vet = {x: points[L].x - points[L-1].x, y: points[L].y - points[L-1].y};
+            X = constFirst * vet.x - vetores[L-1].x;
+            Y = constFirst * vet.y - vetores[L-1].y;
+            vetores[L] = {x: X, y: Y};
+      
+            calcExtremePointsBezir();
+
+        } else {
+            constFirst = (1 - alfas[0]) / intervals[L];
+            constNext = alfas[0] / intervals[0];
+            vetFirst = {x: points[0].x - points[L].x, y: points[0].y - points[L].y};
+            nextVet = {x: points[1].x - points[0].x, y: points[1].y - points[0].y};
+            X = constFirst * vetFirst.x + constNext * nextVet.x;
+            Y = constFirst * vetFirst.y + constNext * nextVet.y;
+            vetores[0] = {x: X, y: Y};
+
+            constFirst = (1 - alfas[L]) / intervals[L-1];
+            constNext = alfas[L] / intervals[L];
+            vetFirst = {x: points[L-1].x - points[L].x, y: points[L-1].y - points[L].y};
+            nextVet = {x: points[0].x - points[L].x, y: points[0].y - points[L].y};
+            X = constFirst * vetFirst.x + constNext * nextVet.x;
+            Y = constFirst * vetFirst.y + constNext * nextVet.y;
+            vetores[L] = {x: X, y: Y};
+            
+            calcExtremeClosed();
+        }
+    }
+}
+
+function calcExtremeClosed() {
+    var X, Y;
+    var coef;
+    var L = qtdPontosJuncao - 1;
+
+    coef = intervals[L] / (3 * (intervals[L] + intervals[0]));
+    X = points[0].x - coef * vetores[0].x;
+    Y = points[0].y - coef * vetores[0].y;
+    pointsBezier[3*L + 2] = {x: X, y: Y};
+
+    coef = intervals[0] / (3 * (intervals[L] + intervals[0]));
+    X = points[0].x + coef * vetores[0].x;
+    Y = points[0].y + coef * vetores[0].y;
+    pointsBezier[1] = {x: X, y: Y};
+
+    coef = intervals[L-1] / (3 * (intervals[L-1] + intervals[L]));
+    X = points[L].x - coef * vetores[L].x;
+    Y = points[L].y - coef * vetores[L].y;
+    pointsBezier[3*L - 1] = {x: X, y: Y};
+
+    coef = intervals[L] / (3 * (intervals[L-1] + intervals[L]));
+    X = points[L].x + coef * vetores[L].x;
+    Y = points[L].y + coef * vetores[L].y;
+    pointsBezier[3*L + 1] = {x: X, y: Y};
+
+    pointsBezier[0] = {x: points[0].x, y: points[0].y};
+    pointsBezier[3*L] = {x: points[L].x, y: points[L].y};
 }
 
 function fmillTangents() {
-  var X, Y;
-
-  for(var i = 1; i < qtdPontosJuncao - 1; i++) {
-    X = points[i+1].x - points[i-1].x;
-    Y = points[i+1].y - points[i-1].y;
-    vetores[i] = {x: X, y: Y};
-  }
+    pointsBezier = [];
+    
+    var X, Y;
+    var L = qtdPontosJuncao - 1;
+    calcIntervals();
+    
+    for(var i = 1; i < L; i++) {
+        X = points[i+1].x - points[i-1].x;
+        Y = points[i+1].y - points[i-1].y;
+        vetores[i] = {x: X, y: Y};
+    }
+    
+    vetores[0] = {x: points[1].x - points[L].x, y: points[1].y - points[L].y};
+    vetores[L] = {x: points[0].x - points[L-1].x, y: points[0].y - points[L-1].y};
+  
+    calcExtremeClosed();
+    calcIntermediatePointsBezir();
 }
+    
 
 function calcExtremePointsBezir() {
   var X, Y;
@@ -302,16 +365,23 @@ function drawPoints() {
         }
     }
     
+    //se a curva for fechada, pegar o primeiro ponto e colocar no proximo
+    var sup = qtdPontosJuncao - 1;
+    if(isChecked === 1) {
+        sup = qtdPontosJuncao;
+        pointsBezier.push({x: points[0].x, y: points[0].y});
+    }
+    
     
     if (isCheckedCurva === 0){
-        for(var j = 0; j < qtdPontosJuncao - 1; j++) {
-            var limInf = 3 * j;
-            var limSup = limInf + 3;
-            var array = [];
-            for (var k = limInf; k <= limSup; k++) {
-                array.push({x: pointsBezier[k].x, y:    pointsBezier[k].y});
-            }           
-            makeCurve(array);
+        for(var j = 0; j < sup; j++) {
+        var limInf = 3 * j;
+        var limSup = limInf + 3;
+        var array = [];
+        for (var k = limInf; k <= limSup; k++) {
+            array.push({x: pointsBezier[k].x, y: pointsBezier[k].y});
+        }           
+        makeCurve(array);
         }
     }
 }
@@ -380,8 +450,12 @@ canvas.addEventListener('mousedown', e => {
     points.push(click);
     calcUs();
     if(qtdPontosJuncao > 2) {
-      toggleMethod();
-      drawPoints();
+        if(isChecked === 1) {
+            toggleMethod();
+        } else {
+            besselTangents();
+        }
+        drawPoints();
     }
   } else {
     move = true;
@@ -415,10 +489,14 @@ canvas.addEventListener('mousemove', e => {
   if(move){
     var antigo = points[index];
     points[index] = {x: e.offsetX, y: e.offsetY, v:{x:0 , y:0}};
-    points[index].v = {x: e.offsetX - antigo.x, y: e.offsetY - antigo.y}
+    points[index].v = {x: e.offsetX - antigo.x, y: e.offsetY - antigo.y};
     if(qtdPontosJuncao > 2) {
-      toggleMethod();
-      drawPoints();
+        if(isChecked === 1) {
+            toggleMethod();
+        } else {
+            besselTangents();
+        }
+        drawPoints();
     }
   }     
 });
@@ -428,7 +506,11 @@ canvas.addEventListener('mousemove', e => {
 setInterval(() => {
   ctx.clearRect(0, 0, canvas.width, canvas.height);//redesenha o canvas
   if(qtdPontosJuncao > 2) {
-    toggleMethod();
+    if(isChecked === 1) {
+        toggleMethod();
+    } else {
+        besselTangents();
+    }
     drawPoints();
   }
 }, 100);
