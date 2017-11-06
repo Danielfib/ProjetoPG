@@ -135,24 +135,23 @@ function checkCurva(){
 //---------------------------------------------------------------
 
 function calcIntervals() {
-  for(var i = 0; i < arrayUs.length - 1; i++) {
-    intervals[i] = arrayUs[i+1] - arrayUs[i];
-  }
-  if(isChecked === 1) {
-    intervals[arrayUs.length - 1] = arrayUs[0] - arrayUs[arrayUs.length - 1];
-  }
+    for(var i = 0; i < arrayUs.length - 1; i++) {
+        intervals[i] = arrayUs[i+1] - arrayUs[i];
+    }
+    if(isChecked === 1) {
+        intervals[arrayUs.length - 1] = arrayUs[0] - arrayUs[arrayUs.length - 1];
+    }
 }
-
 function calcAlfas() {
-  calcIntervals();
-  var L = qtdPontosJuncao - 1;
-  for(var i = 1; i < L; i++) {
-    alfas[i] = intervals[i-1] / (intervals[i-1] + intervals[i]);
-  }
-  if(isChecked === 1) {
-    alfas[0] = intervals[L] / (intervals[L] + intervals[0]);
-    alfas[L] = intervals[L-1] / (intervals[L-1] + intervals[L]);
-  }
+    calcIntervals();
+    var L = qtdPontosJuncao - 1;
+    for(var i = 1; i < L; i++) {
+        alfas[i] = intervals[i-1] / (intervals[i-1] + intervals[i]);
+    }
+    if(isChecked === 1) {
+        alfas[0] = intervals[L] / (intervals[L] + intervals[0]);
+        alfas[L] = intervals[L-1] / (intervals[L-1] + intervals[L]);
+    }
 }
 
 //baseado no toggle, escolhe o metodo de calculo
@@ -193,7 +192,7 @@ function besselTangents() {
     calcIntermediatePointsBezir();
 
     // calculando os vetores dos extremos
-    if(qtdPontosJuncao > 2) {
+    if(qtdPontosJuncao > 0) {
         var vet;
         if(isChecked === 0) {
             constFirst = 2 / intervals[0];
@@ -242,16 +241,18 @@ function calcExtremeClosed() {
     Y = points[0].y - coef * vetores[0].y;
     pointsBezier[3*L + 2] = {x: X, y: Y};
 
-    coef = intervals[0] / (3 * (intervals[L] + intervals[0]));
+    coef = intervals[0] / (3 * (intervals[0]));
     X = points[0].x + coef * vetores[0].x;
     Y = points[0].y + coef * vetores[0].y;
     pointsBezier[1] = {x: X, y: Y};
+    //pointsBezier[0] = {x: points[0].x, y: points[0].y};
 
-    coef = intervals[L-1] / (3 * (intervals[L-1] + intervals[L]));
+    coef = intervals[L-1] / 3;
     X = points[L].x - coef * vetores[L].x;
     Y = points[L].y - coef * vetores[L].y;
     pointsBezier[3*L - 1] = {x: X, y: Y};
-
+    //pointsBezier[3*L] = {x: points[L].x, y: points[L].y};
+    
     coef = intervals[L] / (3 * (intervals[L-1] + intervals[L]));
     X = points[L].x + coef * vetores[L].x;
     Y = points[L].y + coef * vetores[L].y;
@@ -339,9 +340,9 @@ function drawPoints() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);//redesenha o
     //desenha todos os pontos
     
-    if(isCheckedPontos === 0) {
+    if(isCheckedPontos === 0){
         var cor;
-        for (var i in pointsBezier) {
+        for (var i in pointsBezier) {        
             ctx.beginPath();
             ctx.arc(pointsBezier[i].x, pointsBezier[i].y, 5, 0, 2 * Math.PI);
             if(i % 3 === 0) {
@@ -355,7 +356,7 @@ function drawPoints() {
     }
   
     //ligar os pontos(poligonal de controle):
-    if(isCheckedPoligonal === 0) {
+    if(isCheckedPoligonal === 0){
         for (var c in pointsBezier){
             if (c > 0){
                 var xAtual = pointsBezier[c-1].x;
@@ -380,7 +381,8 @@ function drawPoints() {
         pointsBezier.push({x: points[0].x, y: points[0].y});
     }
     
-    if (isCheckedCurva === 0) {
+    
+    if (isCheckedCurva === 0){
         for(var j = 0; j < sup; j++) {
         var limInf = 3 * j;
         var limSup = limInf + 3;
@@ -456,7 +458,7 @@ canvas.addEventListener('mousedown', e => {
     addSlider();
     points.push(click);
     calcUs();
-    if(qtdPontosJuncao > 2) {
+    if(qtdPontosJuncao > 0) {
         if(isChecked === 1) {
             toggleMethod();
         } else {
@@ -497,7 +499,7 @@ canvas.addEventListener('mousemove', e => {
     var antigo = points[index];
     points[index] = {x: e.offsetX, y: e.offsetY, v:{x:0 , y:0}};
     points[index].v = {x: e.offsetX - antigo.x, y: e.offsetY - antigo.y};
-    if(qtdPontosJuncao > 2) {
+    if(qtdPontosJuncao > 0) {
         if(isChecked === 1) {
             toggleMethod();
         } else {
@@ -512,7 +514,7 @@ canvas.addEventListener('mousemove', e => {
 //a ultima linha contem a quant de milissegundos entre cada acao
 setInterval(() => {
   ctx.clearRect(0, 0, canvas.width, canvas.height);//redesenha o canvas
-  if(qtdPontosJuncao > 2) {
+  if(qtdPontosJuncao > 0) {
     if(isChecked === 1) {
         toggleMethod();
     } else {
