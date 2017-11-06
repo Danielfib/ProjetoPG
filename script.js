@@ -217,10 +217,10 @@ function besselTangents() {
             X = constFirst * vetFirst.x + constNext * nextVet.x;
             Y = constFirst * vetFirst.y + constNext * nextVet.y;
             vetores[0] = {x: X, y: Y};
-
+            
             constFirst = (1 - alfas[L]) / intervals[L-1];
             constNext = alfas[L] / intervals[L];
-            vetFirst = {x: points[L-1].x - points[L].x, y: points[L-1].y - points[L].y};
+            vetFirst = {x: points[L].x - points[L-1].x, y: points[L].y - points[L-1].y};
             nextVet = {x: points[0].x - points[L].x, y: points[0].y - points[L].y};
             X = constFirst * vetFirst.x + constNext * nextVet.x;
             Y = constFirst * vetFirst.y + constNext * nextVet.y;
