@@ -138,12 +138,20 @@ function calcIntervals() {
   for(var i = 0; i < arrayUs.length - 1; i++) {
     intervals[i] = arrayUs[i+1] - arrayUs[i];
   }
+  if(isChecked === 1) {
+    intervals[arrayUs.length - 1] = arrayUs[0] - arrayUs[arrayUs.length - 1];
+  }
 }
 
 function calcAlfas() {
   calcIntervals();
-  for(var i = 1; i < qtdPontosJuncao - 1; i++) {
+  var L = qtdPontosJuncao - 1;
+  for(var i = 1; i < L; i++) {
     alfas[i] = intervals[i-1] / (intervals[i-1] + intervals[i]);
+  }
+  if(isChecked === 1) {
+    alfas[0] = intervals[L] / (intervals[L] + intervals[0]);
+    alfas[L] = intervals[L-1] / (intervals[L-1] + intervals[L]);
   }
 }
 
@@ -331,9 +339,9 @@ function drawPoints() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);//redesenha o
     //desenha todos os pontos
     
-    if(isCheckedPontos === 0){
+    if(isCheckedPontos === 0) {
         var cor;
-        for (var i in pointsBezier) {        
+        for (var i in pointsBezier) {
             ctx.beginPath();
             ctx.arc(pointsBezier[i].x, pointsBezier[i].y, 5, 0, 2 * Math.PI);
             if(i % 3 === 0) {
@@ -347,7 +355,7 @@ function drawPoints() {
     }
   
     //ligar os pontos(poligonal de controle):
-    if(isCheckedPoligonal === 0){
+    if(isCheckedPoligonal === 0) {
         for (var c in pointsBezier){
             if (c > 0){
                 var xAtual = pointsBezier[c-1].x;
@@ -372,8 +380,7 @@ function drawPoints() {
         pointsBezier.push({x: points[0].x, y: points[0].y});
     }
     
-    
-    if (isCheckedCurva === 0){
+    if (isCheckedCurva === 0) {
         for(var j = 0; j < sup; j++) {
         var limInf = 3 * j;
         var limSup = limInf + 3;
