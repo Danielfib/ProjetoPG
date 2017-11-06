@@ -7,8 +7,6 @@
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     </head>
     <body>
-        <div id="slider">
-        </div>
         <div style="margin: 20px">
             Informe o número de avaliações desejadas clicando nos botões(começa com 500):<br>
             <button id="menos100" style="height: 20px; width: 50px; margin-top:  10px" onclick="setAvaMenos100()">
@@ -58,6 +56,8 @@
             <input style="margin-left: 15px" onclick="checkCurva()" id="checkBoxCurva" type="checkbox">Curva de Bezier
         </div>
         <canvas id="canvas"></canvas>
+        <div style="margin-bottom: 20px" id="slider">
+        </div>
     </body>
     <script src="script.js"></script>
 </html>
