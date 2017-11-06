@@ -483,6 +483,7 @@ canvas.addEventListener('dblclick', e => {
     //para apagar o u:
     arrayValoresSliders.splice(index, 1);
     arrayUs.splice(index, 1);
+    idSliders--;
     calcUs();
       
     $("#" +index).remove();
