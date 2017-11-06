@@ -10,7 +10,7 @@
         <div id="slider">
         </div>
         <div style="margin: 20px">
-            Informe o número de avaliações desejadas e clique no botão(começa com 1000):<br>
+            Informe o número de avaliações desejadas e clique no botão(começa com 500):<br>
             <button id="menos100" style="height: 20px; width: 50px; margin-top:  10px" onclick="setAvaMenos100()">
                 -100
             </button>
@@ -20,7 +20,7 @@
             <button id="menos2" style="height: 20px; width: 50px; margin-top:  10px" onclick="setAvaMenos2()">
                 -2
             </button>
-            <input style="margin: 5px" type="text" id = "qtdAva" value = "1000">
+            <input style="margin: 5px" type="text" id = "qtdAva" value = "500">
             <button id="mais2" style="height: 20px; width: 50px; margin-top:  10px" onclick="setAvaMais2()">
                 +2
             </button>
@@ -50,7 +50,13 @@
             <input onclick="check()" id="checkBox" type="checkbox">
             Desejo que a curva seja fechada!
         </div>
-        
+        <div style="margin: 20px;">
+            Desejo esconder:<br>
+            <input onclick="checkPontos()" id="checkBoxPontos" type="checkbox">Pontos de Controle
+            <input style="margin-left: 15px" onclick="checkPoligonal()" id="checkBoxPoligonal" type="checkbox">
+            Poligonal de Controle
+            <input style="margin-left: 15px" onclick="checkCurva()" id="checkBoxCurva" type="checkbox">Curva de Bezier
+        </div>
         <canvas id="canvas"></canvas>
     </body>
     <script src="script.js"></script>

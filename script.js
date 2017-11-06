@@ -1,7 +1,7 @@
 var canvas = document.getElementById('canvas');
 var ctx = canvas.getContext('2d');
 
-var av = 1000; //numero de avaliacao(vai ser escolhido pelo usuario)
+var av = 500; //numero de avaliacao(vai ser escolhido pelo usuario)
 var qtdPontosJuncao = 0;
 var points = []; //array dos pontos colocados pelo usuario
 var pointsBezier = []; //pontos de controle de Bezier
@@ -45,7 +45,7 @@ function setAvaMais100() {
 var arrayValoresSliders = [];
 var idSliders = 0;
 function addSlider(){
-    arrayValoresSliders[idSliders] = 50 / 30;
+    arrayValoresSliders[idSliders] = 50 / 50;
     $("#slider").append('<div style="margin: 2px" class="slidecontainer">\
         <input type="range" oninput="setSliderValue(' + idSliders + ')" min="1" max="100" value="50" class="slider" id="' + idSliders++ + '">\
         ' + "u" + (idSliders-1) + '</div>');
@@ -53,7 +53,7 @@ function addSlider(){
 function setSliderValue(idAtual){
     var slider = document.getElementById(idAtual);
     //array guarda o valor do slider em posicao(que eh o id do slider)
-    arrayValoresSliders[idAtual] = parseInt(slider.value) / 30; 
+    arrayValoresSliders[idAtual] = parseInt(slider.value) / 50; 
     //console.log(slider.value, idAtual);
     calcUs();
 }
@@ -104,6 +104,33 @@ function check(){
         $("#derivadasEToggle").css("opacity", 0.35);
     }
     //console.log(isChecked);
+}
+
+var isCheckedPontos = 0;
+function checkPontos() {
+    if (isCheckedPontos === 0){
+        isCheckedPontos = 1;
+    } else {
+        isCheckedPontos = 0;
+    }
+}
+
+var isCheckedPoligonal = 0;
+function checkPoligonal() {
+    if (isCheckedPoligonal === 0){
+        isCheckedPoligonal = 1;
+    } else {
+        isCheckedPoligonal = 0;
+    }
+}
+
+var isCheckedCurva = 0;
+function checkCurva(){
+    if (isCheckedCurva === 0){
+        isCheckedCurva = 1;
+    } else {
+        isCheckedCurva = 0;
+    }
 }
 //---------------------------------------------------------------
 
@@ -239,30 +266,53 @@ function resizeCanvas() {
 function drawPoints() {
     //antes de desenhar a curva apaga tudo:
     ctx.clearRect(0, 0, canvas.width, canvas.height);//redesenha o
-  //desenha todos os pontos
-  var cor;
-  for (var i in pointsBezier) {
-    ctx.beginPath();
-    ctx.arc(pointsBezier[i].x, pointsBezier[i].y, 5, 0, 2 * Math.PI);
-    if(i % 3 === 0) {
-      cor = 'red';
-    } else {
-      cor = 'blue';
-    }
-    ctx.fillStyle = cor;
-    ctx.fill();
-  }
-  
-  //falta ligar os pontos
+    //desenha todos os pontos
     
-    for(var j = 0; j < qtdPontosJuncao - 1; j++) {
-        var limInf = 3 * j;
-        var limSup = limInf + 3;
-        var array = [];
-        for (var k = limInf; k <= limSup; k++) {
-            array.push({x: pointsBezier[k].x, y: pointsBezier[k].y});
-        }           
-        makeCurve(array);
+    if(isCheckedPontos === 0){
+        var cor;
+        for (var i in pointsBezier) {        
+            ctx.beginPath();
+            ctx.arc(pointsBezier[i].x, pointsBezier[i].y, 5, 0, 2 * Math.PI);
+            if(i % 3 === 0) {
+                cor = '#c62828';
+            } else {
+                cor = '#03A9F4';
+            }
+            ctx.fillStyle = cor;
+            ctx.fill();
+        }
+    }
+  
+    //ligar os pontos(poligonal de controle):
+    if(isCheckedPoligonal === 0){
+        for (var c in pointsBezier){
+            if (c > 0){
+                var xAtual = pointsBezier[c-1].x;
+                var yAtual = pointsBezier[c-1].y;
+
+                //deixando a linha tracecjada
+                ctx.setLineDash([5, 3]);
+                ctx.lineWidth = 0.5;
+                ctx.strokeStyle = '#90A4AE';
+                ctx.moveTo(xAtual, yAtual);
+                ctx.lineTo(pointsBezier[c].x, pointsBezier[c].y);
+                ctx.stroke();            
+            }       
+
+        }
+    }
+    
+    
+    if (isCheckedCurva === 0){
+        for(var j = 0; j < qtdPontosJuncao - 1; j++) {
+            var limInf = 3 * j;
+            var limSup = limInf + 3;
+            var array = [];
+            for (var k = limInf; k <= limSup; k++) {
+                array.push({x: pointsBezier[k].x, y:    pointsBezier[k].y});
+            }           
+            makeCurve(array);
+        }
     }
 }
 
@@ -290,17 +340,19 @@ function calcAvaliable(pointsDeCasteljau, t) {
 }
 
 function drawCurve(pointsCurve) {
-  for(var i in pointsCurve) {
-    ctx.beginPath();
+    for(var i in pointsCurve) {
+        ctx.beginPath();
       
-    if(i > 0) {
-      var xAtual = pointsCurve[i-1].x;
-      var yAtual = pointsCurve[i-1].y;
-      ctx.moveTo(xAtual, yAtual);
-      ctx.lineTo(pointsCurve[i].x, pointsCurve[i].y);
-      ctx.stroke();
+        if(i > 0) {
+            var xAtual = pointsCurve[i-1].x;
+            var yAtual = pointsCurve[i-1].y;
+            ctx.moveTo(xAtual, yAtual);
+            ctx.strokeStyle = '#000';
+            ctx.lineWidth = 1.5;
+            ctx.lineTo(pointsCurve[i].x, pointsCurve[i].y);
+            ctx.stroke();
+        }
     }
-  }
 }
 
 //pega dist entre dois pontos
