@@ -192,7 +192,7 @@ function besselTangents() {
     calcIntermediatePointsBezir();
 
     // calculando os vetores dos extremos
-    if(qtdPontosJuncao > 0) {
+    if(qtdPontosJuncao > 2) {
         var vet;
         if(isChecked === 0) {
             constFirst = 2 / intervals[0];
@@ -458,7 +458,7 @@ canvas.addEventListener('mousedown', e => {
     addSlider();
     points.push(click);
     calcUs();
-    if(qtdPontosJuncao > 0) {
+    if(qtdPontosJuncao > 2) {
         if(isChecked === 1) {
             toggleMethod();
         } else {
@@ -499,7 +499,7 @@ canvas.addEventListener('mousemove', e => {
     var antigo = points[index];
     points[index] = {x: e.offsetX, y: e.offsetY, v:{x:0 , y:0}};
     points[index].v = {x: e.offsetX - antigo.x, y: e.offsetY - antigo.y};
-    if(qtdPontosJuncao > 0) {
+    if(qtdPontosJuncao > 2) {
         if(isChecked === 1) {
             toggleMethod();
         } else {
@@ -514,7 +514,7 @@ canvas.addEventListener('mousemove', e => {
 //a ultima linha contem a quant de milissegundos entre cada acao
 setInterval(() => {
   ctx.clearRect(0, 0, canvas.width, canvas.height);//redesenha o canvas
-  if(qtdPontosJuncao > 0) {
+  if(qtdPontosJuncao > 2) {
     if(isChecked === 1) {
         toggleMethod();
     } else {
