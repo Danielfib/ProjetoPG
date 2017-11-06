@@ -10,7 +10,7 @@ O usuário com as parametrizações com slide buttons. O usuário também escolh
 
 
 Explicação da Interface:
-A medida que o usuário vai criando arbitrariamente os pontos, cria-se um novo slide button, pelo qual o usuário dirá o tamanho do intervalo entre aquele u e o passado. O valor de cada slide button pode ser alterado, mudando interativamente os valores dos us.
+A medida que o usuário vai criando arbitrariamente os pontos, cria-se um novo slide button, abaixo do canvas, pelo qual o usuário dirá o tamanho do intervalo entre aquele u e o passado. O valor de cada slide button pode ser alterado, mudando interativamente os valores dos us.
 
 Há um toggle button clareado, que apenas fica disponível quando o usuário marca a checkbox "Desejo que a curva seja fechada!", pois em caso dela ser aberta, FMILL não pode ser usado para calcular as tangentes pois não consegue calcular a primeira e a última, apenas Bessel.
 
